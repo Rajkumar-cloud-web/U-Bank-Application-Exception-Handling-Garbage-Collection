@@ -5,6 +5,7 @@ import com.upgrad.ubank.dtos.Transaction;
 import com.upgrad.ubank.exceptions.AccountAlreadyRegisteredException;
 import com.upgrad.ubank.exceptions.AccountNotFoundException;
 import com.upgrad.ubank.exceptions.IncorrectPasswordException;
+import com.upgrad.ubank.exceptions.InsufficientBalanceException;
 import com.upgrad.ubank.services.*;
 
 import java.util.Scanner;
@@ -161,7 +162,11 @@ public class Application {
         System.out.println("*******Account*******");
         System.out.println("*********************");
 
-        System.out.println(accountService.getAccount(loggedInAccountNo));
+        try {
+            System.out.println(accountService.getAccount(loggedInAccountNo));
+        } catch (AccountNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void deposit () {
@@ -184,11 +189,12 @@ public class Application {
             return;
         }
 
-        Account account = accountService.deposit(loggedInAccountNo, amount);
-        if (account == null) {
-            System.out.println("Could not deposit into account.");
-        } else {
+        Account account = null;
+        try {
+            account = accountService.deposit(loggedInAccountNo, amount);
             System.out.println("Money successfully deposited into account.");
+        } catch (AccountNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -212,11 +218,14 @@ public class Application {
             return;
         }
 
-        Account account = accountService.withdraw(loggedInAccountNo, amount);
-        if (account == null) {
-            System.out.println("Could not withdraw from account.");
-        } else {
+        Account account = null;
+        try {
+            account = accountService.withdraw(loggedInAccountNo, amount);
             System.out.println("Money successfully withdrawn from account.");
+        } catch (AccountNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (InsufficientBalanceException e) {
+            System.out.println(e.getMessage());
         }
     }
 
